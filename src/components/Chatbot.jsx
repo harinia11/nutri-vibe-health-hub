@@ -3,25 +3,281 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([
-    { text: "Hi! I'm your NutriVibe assistant. Ask me anything about nutrition!", sender: 'bot' }
+    { text: "Hi! I'm your NutriVibe assistant. Ask me anything about nutrition or your health conditions!", sender: 'bot' }
   ]);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
 
-  // Sample responses - in a real app, these would come from the JSON file mentioned
-  const responses = {
+  // Nutrition recommendation data
+  const nutritionData = [
+    { 
+      condition: "diabetes", 
+      food: "Whole grains", 
+      benefits: "Controls blood sugar", 
+      avoid: "White rice",
+      nutrients: "Fiber",
+      alternatives: "Quinoa" 
+    },
+    { 
+      condition: "hypertension", 
+      food: "Leafy greens", 
+      benefits: "Lowers blood pressure", 
+      avoid: "Processed food",
+      nutrients: "Potassium",
+      alternatives: "Kale" 
+    },
+    { 
+      condition: "anemia", 
+      food: "Spinach", 
+      benefits: "Increases hemoglobin levels", 
+      avoid: "Caffeine",
+      nutrients: "Iron",
+      alternatives: "Beetroot" 
+    },
+    { 
+      condition: "obesity", 
+      food: "Lean protein", 
+      benefits: "Supports weight loss", 
+      avoid: "Sugary drinks",
+      nutrients: "Protein",
+      alternatives: "Grilled chicken" 
+    },
+    { 
+      condition: "heart disease", 
+      food: "Salmon", 
+      benefits: "Improves heart health", 
+      avoid: "Fried food",
+      nutrients: "Omega-3",
+      alternatives: "Tuna" 
+    },
+    { 
+      condition: "osteoporosis", 
+      food: "Dairy", 
+      benefits: "Strengthens bones", 
+      avoid: "Soft drinks",
+      nutrients: "Calcium",
+      alternatives: "Almond milk" 
+    },
+    { 
+      condition: "pcos", 
+      food: "Nuts", 
+      benefits: "Balances hormones", 
+      avoid: "Dairy",
+      nutrients: "Healthy fats",
+      alternatives: "Walnuts" 
+    },
+    { 
+      condition: "acid reflux", 
+      food: "Ginger tea", 
+      benefits: "Soothes digestion", 
+      avoid: "Spicy food",
+      nutrients: "Anti-inflammatory",
+      alternatives: "Chamomile tea" 
+    },
+    { 
+      condition: "migraine", 
+      food: "Magnesium-rich foods", 
+      benefits: "Reduces migraine frequency", 
+      avoid: "Processed meats",
+      nutrients: "Magnesium",
+      alternatives: "Cashews" 
+    },
+    { 
+      condition: "liver disease", 
+      food: "Green tea", 
+      benefits: "Supports liver function", 
+      avoid: "Alcohol",
+      nutrients: "Antioxidants",
+      alternatives: "Lemon water" 
+    },
+    { 
+      condition: "asthma", 
+      food: "Omega-3 foods", 
+      benefits: "Reduces airway inflammation", 
+      avoid: "Dairy",
+      nutrients: "Omega-3",
+      alternatives: "Mackerel" 
+    },
+    { 
+      condition: "thyroid disorder", 
+      food: "Iodine-rich foods", 
+      benefits: "Supports thyroid function", 
+      avoid: "Soy",
+      nutrients: "Iodine",
+      alternatives: "Seaweed" 
+    },
+    { 
+      condition: "high cholesterol", 
+      food: "Oats", 
+      benefits: "Reduces LDL cholesterol", 
+      avoid: "Fried foods",
+      nutrients: "Soluble fiber",
+      alternatives: "Chia seeds" 
+    },
+    { 
+      condition: "depression", 
+      food: "Dark chocolate", 
+      benefits: "Boosts serotonin", 
+      avoid: "Alcohol",
+      nutrients: "Antioxidants",
+      alternatives: "Almonds" 
+    },
+    { 
+      condition: "kidney disease", 
+      food: "Cranberries", 
+      benefits: "Supports kidney health", 
+      avoid: "Red meat",
+      nutrients: "Antioxidants",
+      alternatives: "Blueberries" 
+    },
+    { 
+      condition: "arthritis", 
+      food: "Turmeric", 
+      benefits: "Reduces inflammation", 
+      avoid: "Processed meats",
+      nutrients: "Curcumin",
+      alternatives: "Ginger" 
+    },
+    { 
+      condition: "stroke recovery", 
+      food: "Berries", 
+      benefits: "Supports brain function", 
+      avoid: "Salty foods",
+      nutrients: "Antioxidants",
+      alternatives: "Pomegranate" 
+    },
+    { 
+      condition: "lactose intolerance", 
+      food: "Almond milk", 
+      benefits: "Dairy alternative", 
+      avoid: "Milk",
+      nutrients: "Calcium",
+      alternatives: "Soy milk" 
+    },
+    { 
+      condition: "gout", 
+      food: "Cherries", 
+      benefits: "Lowers uric acid", 
+      avoid: "Organ meats",
+      nutrients: "Antioxidants",
+      alternatives: "Strawberries" 
+    },
+    { 
+      condition: "menopause", 
+      food: "Flaxseeds", 
+      benefits: "Balances hormones", 
+      avoid: "Caffeine",
+      nutrients: "Phytoestrogens",
+      alternatives: "Sesame seeds" 
+    },
+    { 
+      condition: "liver fatty disease", 
+      food: "Green leafy vegetables", 
+      benefits: "Supports liver detox", 
+      avoid: "Alcohol",
+      nutrients: "Fiber",
+      alternatives: "Broccoli" 
+    },
+    { 
+      condition: "digestive issues", 
+      food: "Probiotic yogurt", 
+      benefits: "Supports gut health", 
+      avoid: "Processed food",
+      nutrients: "Probiotics",
+      alternatives: "Kefir" 
+    },
+    { 
+      condition: "skin acne", 
+      food: "Avocado", 
+      benefits: "Nourishes skin", 
+      avoid: "Sugar",
+      nutrients: "Healthy fats",
+      alternatives: "Walnuts" 
+    },
+    { 
+      condition: "chronic fatigue", 
+      food: "Bananas", 
+      benefits: "Boosts energy", 
+      avoid: "Processed sugar",
+      nutrients: "Magnesium",
+      alternatives: "Dates" 
+    },
+    { 
+      condition: "type 2 diabetes", 
+      food: "Quinoa", 
+      benefits: "Regulates blood sugar", 
+      avoid: "Sugary drinks",
+      nutrients: "Fiber",
+      alternatives: "Brown rice" 
+    },
+    { 
+      condition: "gallbladder issues", 
+      food: "Beets", 
+      benefits: "Supports bile flow", 
+      avoid: "Fried foods",
+      nutrients: "Betaine",
+      alternatives: "Artichokes" 
+    },
+    { 
+      condition: "chronic stress", 
+      food: "Green tea", 
+      benefits: "Reduces stress", 
+      avoid: "Caffeine",
+      nutrients: "L-Theanine",
+      alternatives: "Chamomile tea" 
+    },
+    { 
+      condition: "liver cirrhosis", 
+      food: "Garlic", 
+      benefits: "Supports liver detox", 
+      avoid: "Alcohol",
+      nutrients: "Sulfur compounds",
+      alternatives: "Onions" 
+    },
+    { 
+      condition: "seasonal allergies", 
+      food: "Local honey", 
+      benefits: "Builds immunity", 
+      avoid: "Dairy",
+      nutrients: "Antioxidants",
+      alternatives: "Ginger" 
+    },
+    { 
+      condition: "prostate health", 
+      food: "Tomatoes", 
+      benefits: "Supports prostate health", 
+      avoid: "Processed meats",
+      nutrients: "Lycopene",
+      alternatives: "Watermelon" 
+    },
+    { 
+      condition: "pregnancy", 
+      food: "Ginger tea", 
+      benefits: "Reduces nausea", 
+      avoid: "Caffeine",
+      nutrients: "Gingerol",
+      alternatives: "Peppermint tea" 
+    },
+    { 
+      condition: "rheumatoid arthritis", 
+      food: "Turmeric", 
+      benefits: "Reduces inflammation", 
+      avoid: "Processed meats",
+      nutrients: "Curcumin",
+      alternatives: "Ginger" 
+    }
+  ];
+
+  // Generic responses for common greetings
+  const genericResponses = {
     "hello": "Hello! How can I help you with your nutrition today?",
-    "hi": "Hi there! Ask me about healthy eating or nutrition tips!",
-    "food": "A balanced diet consists of proteins, carbohydrates, fats, vitamins, and minerals. Try to include a variety of colorful fruits and vegetables in your meals.",
-    "protein": "Good sources of protein include eggs, chicken, fish, tofu, beans, and nuts. It's essential for muscle building and repair.",
-    "carbs": "Healthy carbohydrates come from whole grains, fruits, vegetables, and legumes. They provide energy for your body.",
-    "fat": "Healthy fats are important for your body. Sources include avocados, olive oil, nuts, and fatty fish like salmon.",
-    "vegetables": "Aim to eat a variety of vegetables daily. They provide essential vitamins, minerals, and fiber.",
-    "fruits": "Fruits are rich in vitamins, minerals, and antioxidants. Try to eat a variety of colors.",
-    "water": "Staying hydrated is crucial. Aim to drink at least 8 glasses of water daily.",
-    "diet": "The best diet is one that's balanced, sustainable, and enjoyable for you. Focus on whole foods and moderation.",
-    "weight loss": "Sustainable weight loss comes from a combination of healthy eating, portion control, and regular exercise.",
-    "exercise": "Regular physical activity is important for overall health. Aim for at least 150 minutes of moderate activity weekly."
+    "hi": "Hi there! Ask me about nutrition for specific health conditions!",
+    "hey": "Hey! What nutrition advice are you looking for today?",
+    "help": "I can provide nutrition recommendations for various health conditions. Try asking me about foods for diabetes, heart disease, or other conditions.",
+    "thanks": "You're welcome! Is there anything else I can help you with?",
+    "thank you": "You're welcome! Feel free to ask if you need more nutrition advice.",
+    "bye": "Goodbye! Remember to make healthy food choices!",
+    "food": "A balanced diet consists of proteins, carbohydrates, fats, vitamins, and minerals. Try to include a variety of colorful fruits and vegetables in your meals."
   };
 
   // Scroll to bottom whenever messages update
@@ -38,20 +294,64 @@ const Chatbot = () => {
     
     // Process user input and get response
     setTimeout(() => {
-      let botResponse = "I'm not sure how to respond to that. Try asking about nutrition, foods, or healthy eating!";
+      const userInput = input.toLowerCase();
       
-      // Simple keyword matching (in a real app, this would be more sophisticated)
-      for (const [keyword, response] of Object.entries(responses)) {
-        if (input.toLowerCase().includes(keyword)) {
-          botResponse = response;
+      // Check for generic responses first
+      for (const [keyword, response] of Object.entries(genericResponses)) {
+        if (userInput === keyword || userInput.includes(` ${keyword} `) || userInput.startsWith(`${keyword} `) || userInput.endsWith(` ${keyword}`)) {
+          setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+          setInput('');
+          return;
+        }
+      }
+      
+      // Check for health conditions in the nutrition data
+      let matchedCondition = false;
+      
+      for (const item of nutritionData) {
+        if (userInput.includes(item.condition)) {
+          const response = `For ${item.condition}, I recommend eating ${item.food} which contains ${item.nutrients}. It ${item.benefits}. You should avoid ${item.avoid}. An alternative option is ${item.alternatives}.`;
+          setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+          matchedCondition = true;
           break;
         }
       }
       
-      setMessages(prev => [...prev, { text: botResponse, sender: 'bot' }]);
+      // If no specific condition matched, look for food related keywords
+      if (!matchedCondition) {
+        if (userInput.includes("food") && userInput.includes("for")) {
+          // Extract possible condition from the query
+          for (const item of nutritionData) {
+            if (userInput.includes(item.condition)) {
+              const response = `Good foods for ${item.condition} include ${item.food}. It ${item.benefits} and provides ${item.nutrients}.`;
+              setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+              matchedCondition = true;
+              break;
+            }
+          }
+        } else if (userInput.includes("benefit") || userInput.includes("good for")) {
+          // Check if any foods are mentioned
+          for (const item of nutritionData) {
+            if (userInput.includes(item.food.toLowerCase())) {
+              const response = `${item.food} ${item.benefits}. It's rich in ${item.nutrients} and is good for people with ${item.condition}.`;
+              setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+              matchedCondition = true;
+              break;
+            }
+          }
+        }
+      }
+      
+      // If still no match, give a general response
+      if (!matchedCondition) {
+        setMessages(prev => [...prev, { 
+          text: "I'm not sure about that specific condition or food. Try asking about common health conditions like diabetes, hypertension, or heart disease, or ask for general nutrition advice.", 
+          sender: 'bot' 
+        }]);
+      }
+      
+      setInput('');
     }, 1000);
-    
-    setInput('');
   };
 
   return (
@@ -73,7 +373,7 @@ const Chatbot = () => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your nutrition question..."
+          placeholder="Ask about foods for specific health conditions..."
         />
         <button type="submit" className="btn">Send</button>
       </form>

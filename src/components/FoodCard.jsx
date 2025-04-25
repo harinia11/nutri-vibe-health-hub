@@ -1,23 +1,23 @@
 
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
+import { useToast } from '../hooks/use-toast';
 
 const FoodCard = ({ food }) => {
   const { addItem } = useCart();
+  const { toast } = useToast();
   const { name, image, benefits, price } = food;
 
   const handleAddToCart = () => {
     addItem(food);
-    // Show notification
-    const notification = document.createElement('div');
-    notification.className = 'notification success';
-    notification.textContent = `${name} added to cart!`;
-    document.body.appendChild(notification);
     
-    // Remove notification after 3 seconds
-    setTimeout(() => {
-      notification.remove();
-    }, 3000);
+    // Show notification using shadcn toast
+    toast({
+      title: "Added to cart!",
+      description: `${name} has been added to your cart.`,
+      variant: "success",
+      duration: 3000,
+    });
   };
 
   return (
