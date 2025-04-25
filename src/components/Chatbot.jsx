@@ -1,12 +1,14 @@
-
 import React, { useState, useEffect, useRef } from 'react';
+import { Mic, MicOff } from 'lucide-react';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([
     { text: "Hi! I'm your NutriVibe assistant. Ask me anything about nutrition or your health conditions!", sender: 'bot' }
   ]);
   const [input, setInput] = useState('');
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   // Nutrition recommendation data
   const nutritionData = [
@@ -280,28 +282,93 @@ const Chatbot = () => {
     "food": "A balanced diet consists of proteins, carbohydrates, fats, vitamins, and minerals. Try to include a variety of colorful fruits and vegetables in your meals."
   };
 
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+      
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        handleVoiceInput(transcript);
+      };
+      
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+      
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, []);
+
   // Scroll to bottom whenever messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current.abort();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error('Speech recognition error:', error);
+      }
+    }
+  };
 
-    // Add user message
-    setMessages([...messages, { text: input, sender: 'user' }]);
+  const handleVoiceInput = (voiceText) => {
+    if (!voiceText.trim()) return;
     
+    // Add user message
+    setMessages(prev => [...prev, { text: voiceText, sender: 'user' }]);
+    processUserInput(voiceText);
+  };
+
+  const processUserInput = (userInput) => {
     // Process user input and get response
     setTimeout(() => {
-      const userInput = input.toLowerCase();
+      const input = userInput.toLowerCase();
       
       // Check for generic responses first
       for (const [keyword, response] of Object.entries(genericResponses)) {
-        if (userInput === keyword || userInput.includes(` ${keyword} `) || userInput.startsWith(`${keyword} `) || userInput.endsWith(` ${keyword}`)) {
+        if (input === keyword || input.includes(` ${keyword} `) || input.startsWith(`${keyword} `) || input.endsWith(` ${keyword}`)) {
           setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
           setInput('');
           return;
+        }
+      }
+      
+      // Check for voice commands like "Hey NutriBot, suggest a diet for thyroid"
+      if (input.includes("hey nutribot") || input.includes("hey nutri bot")) {
+        if (input.includes("suggest") || input.includes("recommend")) {
+          // Extract condition from the query
+          const conditions = nutritionData.map(item => item.condition);
+          for (const condition of conditions) {
+            if (input.includes(condition)) {
+              const item = nutritionData.find(item => item.condition === condition);
+              const response = `For ${item.condition}, I recommend eating ${item.food} which contains ${item.nutrients}. It ${item.benefits}. You should avoid ${item.avoid}. An alternative option is ${item.alternatives}.`;
+              setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
+              setInput('');
+              return;
+            }
+          }
         }
       }
       
@@ -309,7 +376,7 @@ const Chatbot = () => {
       let matchedCondition = false;
       
       for (const item of nutritionData) {
-        if (userInput.includes(item.condition)) {
+        if (input.includes(item.condition)) {
           const response = `For ${item.condition}, I recommend eating ${item.food} which contains ${item.nutrients}. It ${item.benefits}. You should avoid ${item.avoid}. An alternative option is ${item.alternatives}.`;
           setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
           matchedCondition = true;
@@ -319,20 +386,20 @@ const Chatbot = () => {
       
       // If no specific condition matched, look for food related keywords
       if (!matchedCondition) {
-        if (userInput.includes("food") && userInput.includes("for")) {
+        if (input.includes("food") && input.includes("for")) {
           // Extract possible condition from the query
           for (const item of nutritionData) {
-            if (userInput.includes(item.condition)) {
+            if (input.includes(item.condition)) {
               const response = `Good foods for ${item.condition} include ${item.food}. It ${item.benefits} and provides ${item.nutrients}.`;
               setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
               matchedCondition = true;
               break;
             }
           }
-        } else if (userInput.includes("benefit") || userInput.includes("good for")) {
+        } else if (input.includes("benefit") || input.includes("good for")) {
           // Check if any foods are mentioned
           for (const item of nutritionData) {
-            if (userInput.includes(item.food.toLowerCase())) {
+            if (input.includes(item.food.toLowerCase())) {
               const response = `${item.food} ${item.benefits}. It's rich in ${item.nutrients} and is good for people with ${item.condition}.`;
               setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
               matchedCondition = true;
@@ -352,6 +419,15 @@ const Chatbot = () => {
       
       setInput('');
     }, 1000);
+  };
+
+  const handleSend = (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    // Add user message
+    setMessages([...messages, { text: input, sender: 'user' }]);
+    processUserInput(input);
   };
 
   return (
@@ -375,6 +451,13 @@ const Chatbot = () => {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about foods for specific health conditions..."
         />
+        <button 
+          type="button" 
+          onClick={toggleListening} 
+          className={`voice-btn ${isListening ? 'active' : ''}`}
+        >
+          {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+        </button>
         <button type="submit" className="btn">Send</button>
       </form>
     </div>

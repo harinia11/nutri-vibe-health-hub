@@ -2,6 +2,7 @@
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../hooks/use-toast';
+import { Button } from './ui/button';
 
 const FoodCard = ({ food }) => {
   const { addItem } = useCart();
@@ -26,9 +27,12 @@ const FoodCard = ({ food }) => {
       <h3 className="food-title">{name}</h3>
       <p className="food-price">₹{price}</p>
       <p className="food-benefits">{benefits}</p>
-      <button className="btn" onClick={handleAddToCart}>
+      <Button 
+        className="btn" 
+        onClick={handleAddToCart}
+      >
         Add to Cart
-      </button>
+      </Button>
     </div>
   );
 };
