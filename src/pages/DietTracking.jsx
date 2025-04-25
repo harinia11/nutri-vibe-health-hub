@@ -1,5 +1,6 @@
-
 import React, { useState } from 'react';
+import HabitTracker from '../components/HabitTracker';
+import HealthPoints from '../components/HealthPoints';
 
 const DietTracking = () => {
   const [imageURL, setImageURL] = useState(null);
@@ -70,28 +71,12 @@ const DietTracking = () => {
                 🧠 AI Prediction: <strong>{prediction}</strong> ({maxPred}% confidence)
               </div>
             )}
-            {prediction === 'Healthy' && (
-              <p style={{ color: 'green', marginTop: '20px' }}>
-                Great choice! This food is good for your health. Keep up the good habits!
-              </p>
-            )}
-            {prediction === 'Unhealthy' && (
-              <p style={{ color: '#e45858', marginTop: '20px' }}>
-                This food may not be the healthiest choice. Consider alternatives with more nutrients and less processed ingredients.
-              </p>
-            )}
           </>
         )}
 
-        <div style={{ marginTop: '30px' }}>
-          <h3>Tips for healthier eating:</h3>
-          <ul style={{ textAlign: 'left', marginTop: '15px' }}>
-            <li>Choose whole foods over processed options</li>
-            <li>Include a variety of colorful vegetables</li>
-            <li>Opt for lean proteins</li>
-            <li>Limit added sugars and salt</li>
-            <li>Stay hydrated with water instead of sugary drinks</li>
-          </ul>
+        <div className="mt-8">
+          <HabitTracker />
+          <HealthPoints />
         </div>
       </div>
     </div>
