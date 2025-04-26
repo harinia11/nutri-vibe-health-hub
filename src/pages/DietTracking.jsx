@@ -1,10 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Award, QrCode, Globe } from "lucide-react";
+import { Camera, Award, Globe } from "lucide-react";
 import HabitTracker from '../components/HabitTracker';
 import HealthPoints from '../components/HealthPoints';
 
@@ -196,18 +195,12 @@ const DietTracking = () => {
           <CardHeader>
             <CardTitle className="flex flex-col sm:flex-row sm:justify-between gap-3">
               <span>Food Scanner</span>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2">
                 <Badge 
                   className={`cursor-pointer ${scanMode === 'food' ? 'bg-primary' : 'bg-secondary'}`}
                   onClick={() => handleScanSelect('food')}
                 >
                   <Camera size={14} className="mr-1" /> {languages[currentLanguage].scanFood}
-                </Badge>
-                <Badge 
-                  className={`cursor-pointer ${scanMode === 'barcode' ? 'bg-primary' : 'bg-secondary'}`}
-                  onClick={() => handleScanSelect('barcode')}
-                >
-                  <QrCode size={14} className="mr-1" /> {languages[currentLanguage].scanBarcode}
                 </Badge>
                 <Badge 
                   className={`cursor-pointer ${scanMode === 'ar' ? 'bg-primary' : 'bg-secondary'}`}
@@ -219,10 +212,10 @@ const DietTracking = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center max-w-lg mx-auto">
               <Button 
                 onClick={() => fileInputRef.current.click()}
-                className="mb-4 w-full max-w-xs"
+                className="mb-4 w-full"
               >
                 {languages[currentLanguage].uploadLabel}
               </Button>
@@ -242,23 +235,15 @@ const DietTracking = () => {
               )}
 
               {imageURL && !loading && (
-                <div className="w-full flex flex-col items-center">
-                  <img src={imageURL} alt="preview" className="max-w-full max-h-96 object-contain rounded-lg" />
+                <div className="w-full space-y-4">
+                  <img src={imageURL} alt="preview" className="w-full max-h-96 object-contain rounded-lg" />
                   {prediction && (
-                    <div className={`mt-4 p-4 w-full rounded-lg text-center ${
+                    <div className={`p-4 w-full rounded-lg text-center ${
                       prediction === 'Healthy' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
                       🧠 AI Prediction: <strong>{prediction}</strong> ({maxPred}% confidence)
                     </div>
                   )}
-                </div>
-              )}
-              
-              {scanMode === 'barcode' && (
-                <div className="border-2 border-dashed border-muted p-6 rounded-md w-full text-center mt-4">
-                  <QrCode size={64} className="mx-auto mb-4 text-muted-foreground" />
-                  <p>Tap "{languages[currentLanguage].uploadLabel}" to scan a food product barcode</p>
-                  <p className="text-sm text-muted-foreground mt-2">Get immediate nutrition information and health assessment</p>
                 </div>
               )}
               
