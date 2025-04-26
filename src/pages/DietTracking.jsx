@@ -1,10 +1,9 @@
-
 import React, { useState, useRef } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Award, QrCode, Language } from "lucide-react";
+import { Camera, Award, QrCode, Globe } from "lucide-react";
 import HabitTracker from '../components/HabitTracker';
 import HealthPoints from '../components/HealthPoints';
 
@@ -83,7 +82,7 @@ const DietTracking = () => {
             <p className="text-muted-foreground">Upload your food photo to check if it's healthy or not</p>
           </div>
           <Button variant="outline" onClick={handleLanguageChange}>
-            <Language className="mr-2" />
+            <Globe className="mr-2" />
             {languages[currentLanguage].label}
           </Button>
         </div>
