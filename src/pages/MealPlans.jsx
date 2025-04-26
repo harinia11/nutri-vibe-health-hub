@@ -73,7 +73,7 @@ const MealPlans = () => {
       id: 4,
       title: 'Low Carb Plan',
       description: 'Reduce carb intake with these delicious meal options.',
-      image: 'https://images.unsplash.com/photo-1488516785564-8655d7c2c648?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+      image: 'https://images.unsplash.com/photo-1615937657715-bc7b4b7962c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
       calories: '1600-1800',
       duration: '10 days',
       recipes: [

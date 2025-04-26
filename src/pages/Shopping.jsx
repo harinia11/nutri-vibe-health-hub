@@ -1,8 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import FoodCard from '../components/FoodCard';
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const Shopping = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  
   const categories = {
     "Fruits": {
       image: "https://th.bing.com/th/id/OIP.22XOhxYrd_Pu__NkrGadMgHaEo?rs=1&pid=ImgDetMain",
@@ -71,9 +75,60 @@ const Shopping = () => {
     }
   };
 
+  // Filter all foods across all categories
+  const getAllFoods = () => {
+    let allFoods = [];
+    Object.values(categories).forEach(category => {
+      allFoods = [...allFoods, ...category.foods];
+    });
+    return allFoods;
+  };
+
+  const filterFoods = (query) => {
+    if (!query.trim()) return null; // Return null when search is empty
+    
+    const lowerQuery = query.toLowerCase();
+    const foods = getAllFoods();
+    return foods.filter(food => 
+      food.name.toLowerCase().includes(lowerQuery) ||
+      food.benefits.toLowerCase().includes(lowerQuery)
+    );
+  };
+
+  const searchResults = searchQuery ? filterFoods(searchQuery) : null;
+
   return (
     <div className="container page-container">
       <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Healthy Shopping</h1>
+      
+      <div className="search-container" style={{ maxWidth: '500px', margin: '0 auto 40px auto' }}>
+        <div className="flex items-center space-x-2 border rounded-md p-2 bg-background">
+          <Search className="text-muted-foreground h-5 w-5" />
+          <Input 
+            type="text" 
+            placeholder="Search foods..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+        </div>
+      </div>
+      
+      {searchResults && searchResults.length > 0 ? (
+        <div>
+          <h2 style={{ marginBottom: '20px' }}>Search Results</h2>
+          <div className="grid">
+            {searchResults.map((food, index) => (
+              <FoodCard key={`search-${index}`} food={food} />
+            ))}
+          </div>
+          <div style={{ margin: '30px 0', borderTop: '1px solid #eee', paddingTop: '20px' }}>
+            <h3>All Categories</h3>
+          </div>
+        </div>
+      ) : searchResults && searchResults.length === 0 ? (
+        <p style={{ textAlign: 'center', marginBottom: '30px' }}>No foods found matching "{searchQuery}"</p>
+      ) : null}
       
       {Object.entries(categories).map(([categoryName, categoryData]) => (
         <div key={categoryName} style={{ marginBottom: '50px' }}>
@@ -84,7 +139,7 @@ const Shopping = () => {
           
           <div className="grid">
             {categoryData.foods.map((food, index) => (
-              <FoodCard key={index} food={food} />
+              <FoodCard key={`${categoryName}-${index}`} food={food} />
             ))}
           </div>
         </div>
