@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,11 +18,103 @@ const DietTracking = () => {
   const [scanMode, setScanMode] = useState('food'); // 'food', 'barcode', 'ar'
   const [currentLanguage, setCurrentLanguage] = useState('en');
   
+  // Health tracking states
+  const [healthyCount, setHealthyCount] = useState(() => {
+    const saved = localStorage.getItem('healthyCount');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  
+  const [points, setPoints] = useState(() => {
+    const saved = localStorage.getItem('healthPoints');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  
+  const [badges, setBadges] = useState(() => {
+    const saved = localStorage.getItem('earnedBadges');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Badge definitions
+  const badgeThresholds = [
+    { count: 3, name: "Healthy Starter", description: "Track 3 healthy meals" },
+    { count: 5, name: "Super Eater", description: "Track 5 healthy meals" },
+    { count: 10, name: "Nutrition Hero", description: "Track 10 healthy meals" },
+    { count: 20, name: "Meal Master", description: "Track 20 healthy meals" },
+    { count: 30, name: "Nutrition Ninja", description: "Track 30 healthy meals" },
+  ];
+  
+  // Save data to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('healthyCount', healthyCount.toString());
+    localStorage.setItem('healthPoints', points.toString());
+    localStorage.setItem('earnedBadges', JSON.stringify(badges));
+  }, [healthyCount, points, badges]);
+  
+  // Check for new badges
+  useEffect(() => {
+    badgeThresholds.forEach(badge => {
+      if (healthyCount >= badge.count && !badges.some(b => b.name === badge.name)) {
+        const newBadge = { name: badge.name, description: badge.description, earnedAt: new Date().toISOString() };
+        setBadges(prev => [...prev, newBadge]);
+        
+        toast({
+          title: "New Badge Earned!",
+          description: `Congratulations! You've earned the "${badge.name}" badge!`,
+          variant: "default",
+        });
+      }
+    });
+  }, [healthyCount, badges, toast]);
+  
   const languages = {
-    en: { label: 'English', uploadLabel: 'Choose Photo', analyzing: 'Analyzing your food...' },
-    hi: { label: 'हिंदी', uploadLabel: 'फोटो चुनें', analyzing: 'आपके भोजन का विश्लेषण करना...' },
-    ta: { label: 'தமிழ்', uploadLabel: 'புகைப்படத்தைத் தேர்வுசெய்க', analyzing: 'உங்கள் உணவை ஆராய்கிறது...' },
-    te: { label: 'తెలుగు', uploadLabel: 'ఫోటోను ఎంచుకోండి', analyzing: 'మీ ఆహారాన్ని విశ్లేషిస్తోంది...' }
+    en: { 
+      label: 'English', 
+      uploadLabel: 'Choose Photo', 
+      analyzing: 'Analyzing your food...',
+      healthyResult: 'Healthy food detected! +10 points',
+      unhealthyResult: 'This food may not be the healthiest choice',
+      scanFood: 'Food Scan',
+      scanBarcode: 'Barcode',
+      scanAR: 'AR Preview',
+      points: 'Points',
+      badges: 'Badges'
+    },
+    hi: { 
+      label: 'हिंदी', 
+      uploadLabel: 'फोटो चुनें', 
+      analyzing: 'आपके भोजन का विश्लेषण करना...',
+      healthyResult: 'स्वस्थ भोजन का पता चला! +10 अंक',
+      unhealthyResult: 'यह भोजन सबसे स्वस्थ विकल्प नहीं हो सकता है',
+      scanFood: 'खाना स्कैन',
+      scanBarcode: 'बारकोड',
+      scanAR: 'एआर प्रीव्यू',
+      points: 'अंक',
+      badges: 'बैज'
+    },
+    ta: { 
+      label: 'தமிழ்', 
+      uploadLabel: 'புகைப்படத்தைத் தேர்வுசெய்க', 
+      analyzing: 'உங்கள் உணவை ஆராய்கிறது...',
+      healthyResult: 'ஆரோக்கியமான உணவு கண்டறியப்பட்டது! +10 புள்ளிகள்',
+      unhealthyResult: 'இந்த உணவு ஆரோக்கியமான தேர்வாக இல்லாமல் இருக்கலாம்',
+      scanFood: 'உணவு ஸ்கேன்',
+      scanBarcode: 'பார்கோடு',
+      scanAR: 'AR முன்னோட்டம்',
+      points: 'புள்ளிகள்',
+      badges: 'பதக்கங்கள்'
+    },
+    te: { 
+      label: 'తెలుగు', 
+      uploadLabel: 'ఫోటోను ఎంచుకోండి', 
+      analyzing: 'మీ ఆహారాన్ని విశ్లేషిస్తోంది...',
+      healthyResult: 'ఆరోగ్యకరమైన ఆహారం కనుగొనబడింది! +10 పాయింట్లు',
+      unhealthyResult: 'ఈ ఆహారం ఆరోగ్యకరమైన ఎంపిక కాకపోవచ్చు',
+      scanFood: 'ఆహారం స్కాన్',
+      scanBarcode: 'బార్కోడ్',
+      scanAR: 'AR ప్రివ్యూ',
+      points: 'పాయింట్లు',
+      badges: 'బ్యాడ్జీలు'
+    }
   };
 
   const handleImageUpload = async (e) => {
@@ -40,11 +133,17 @@ const DietTracking = () => {
       setMaxPred((Math.random() * 20 + 80).toFixed(2)); // Random confidence between 80-100%
       setLoading(false);
       
-      // Award points for food tracking
+      // Award points for healthy food
       if (isHealthy) {
+        // Increase healthy count
+        setHealthyCount(prevCount => prevCount + 1);
+        
+        // Award points
+        setPoints(prevPoints => prevPoints + 10);
+        
         toast({
           title: "Points Earned!",
-          description: "You earned 10 points for eating healthy food!",
+          description: languages[currentLanguage].healthyResult,
           variant: "default",
         });
       }
@@ -52,10 +151,10 @@ const DietTracking = () => {
   };
 
   const handleLanguageChange = () => {
-    const languages = ['en', 'hi', 'ta', 'te'];
-    const currentIndex = languages.indexOf(currentLanguage);
-    const nextIndex = (currentIndex + 1) % languages.length;
-    setCurrentLanguage(languages[nextIndex]);
+    const languageKeys = Object.keys(languages);
+    const currentIndex = languageKeys.indexOf(currentLanguage);
+    const nextIndex = (currentIndex + 1) % languageKeys.length;
+    setCurrentLanguage(languageKeys[nextIndex]);
   };
 
   const handleScanSelect = (mode) => {
@@ -68,7 +167,7 @@ const DietTracking = () => {
     } else if (mode === 'ar') {
       toast({
         title: "AR Feature",
-        description: "This feature is coming soon! It will detect food items and estimate calories in real-time.",
+        description: "This feature will detect food items and estimate calories in real-time.",
       });
     }
   };
@@ -76,39 +175,45 @@ const DietTracking = () => {
   return (
     <div className="container page-container">
       <div className="diet-tracking-container max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
           <div>
             <h2 className="text-3xl font-bold">📸 Diet Tracking</h2>
             <p className="text-muted-foreground">Upload your food photo to check if it's healthy or not</p>
           </div>
-          <Button variant="outline" onClick={handleLanguageChange}>
-            <Globe className="mr-2" />
-            {languages[currentLanguage].label}
-          </Button>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-primary/10 px-3 py-1 rounded-full">
+              <Award size={16} className="text-primary" />
+              <span className="font-medium">{points} {languages[currentLanguage].points}</span>
+            </div>
+            <Button variant="outline" onClick={handleLanguageChange}>
+              <Globe className="mr-2" />
+              {languages[currentLanguage].label}
+            </Button>
+          </div>
         </div>
         
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="flex justify-between">
+            <CardTitle className="flex flex-col sm:flex-row sm:justify-between gap-3">
               <span>Food Scanner</span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Badge 
                   className={`cursor-pointer ${scanMode === 'food' ? 'bg-primary' : 'bg-secondary'}`}
                   onClick={() => handleScanSelect('food')}
                 >
-                  <Camera size={14} className="mr-1" /> Food Scan
+                  <Camera size={14} className="mr-1" /> {languages[currentLanguage].scanFood}
                 </Badge>
                 <Badge 
                   className={`cursor-pointer ${scanMode === 'barcode' ? 'bg-primary' : 'bg-secondary'}`}
                   onClick={() => handleScanSelect('barcode')}
                 >
-                  <QrCode size={14} className="mr-1" /> Barcode
+                  <QrCode size={14} className="mr-1" /> {languages[currentLanguage].scanBarcode}
                 </Badge>
                 <Badge 
                   className={`cursor-pointer ${scanMode === 'ar' ? 'bg-primary' : 'bg-secondary'}`}
                   onClick={() => handleScanSelect('ar')}
                 >
-                  <Award size={14} className="mr-1" /> AR Preview
+                  <Award size={14} className="mr-1" /> {languages[currentLanguage].scanAR}
                 </Badge>
               </div>
             </CardTitle>
@@ -161,7 +266,16 @@ const DietTracking = () => {
                 <div className="border-2 border-dashed border-muted p-6 rounded-md w-full text-center mt-4">
                   <Camera size={64} className="mx-auto mb-4 text-muted-foreground" />
                   <p className="font-semibold">Augmented Reality Food Scanner</p>
-                  <p className="text-sm text-muted-foreground mt-2">Coming Soon! Scan your plate to get real-time nutritional information</p>
+                  <p className="text-sm text-muted-foreground mt-2">Scan your plate to get real-time nutritional information</p>
+                  <Button 
+                    className="mt-4" 
+                    onClick={() => toast({
+                      title: "AR Scanner",
+                      description: "This feature will be available soon. It will analyze your food in real-time!"
+                    })}
+                  >
+                    Try AR Scanner
+                  </Button>
                 </div>
               )}
             </div>
@@ -170,7 +284,13 @@ const DietTracking = () => {
 
         <div className="mt-8 space-y-8">
           <HabitTracker />
-          <HealthPoints />
+          <HealthPoints 
+            points={points} 
+            earnedBadges={badges} 
+            nextMilestone={
+              badgeThresholds.find(badge => !badges.some(b => b.name === badge.name))?.count || 50
+            } 
+          />
         </div>
       </div>
     </div>

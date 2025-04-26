@@ -24,8 +24,10 @@ const CartItem = ({ item }) => {
   const itemPrice = parseFloat(price.split('/')[0]) * quantity;
 
   return (
-    <div className="flex items-start gap-4 border rounded-md p-4 mb-4">
-      <img src={image} alt={name} className="w-24 h-24 object-cover rounded-md" />
+    <div className="flex flex-wrap md:flex-nowrap items-start gap-4 border rounded-md p-4 mb-4">
+      <div className="w-20 h-20 min-w-20 overflow-hidden rounded-md">
+        <img src={image} alt={name} className="w-full h-full object-cover" />
+      </div>
       <div className="flex-1">
         <div className="flex justify-between">
           <h3 className="text-lg font-medium">{name}</h3>
@@ -33,11 +35,11 @@ const CartItem = ({ item }) => {
         </div>
         <p className="text-sm text-muted-foreground mb-3">Unit price: ₹{price}</p>
         
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={handleDecrease}>-</Button>
+            <Button size="sm" variant="outline" onClick={handleDecrease} className="h-8 w-8 p-0">-</Button>
             <Badge variant="secondary">{quantity}</Badge>
-            <Button size="sm" variant="outline" onClick={handleIncrease}>+</Button>
+            <Button size="sm" variant="outline" onClick={handleIncrease} className="h-8 w-8 p-0">+</Button>
           </div>
           <Button 
             size="sm" 

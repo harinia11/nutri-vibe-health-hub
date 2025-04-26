@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { useCart } from '../contexts/CartContext';
-import { useToast } from '../hooks/use-toast';
-import { Button } from './ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 const FoodCard = ({ food }) => {
   const { addItem } = useCart();
@@ -12,12 +12,10 @@ const FoodCard = ({ food }) => {
   const handleAddToCart = () => {
     addItem(food);
     
-    // Show notification using shadcn toast
+    // Show notification using toast
     toast({
       title: "Added to cart!",
       description: `${name} has been added to your cart.`,
-      variant: "success",
-      duration: 3000,
     });
   };
 
