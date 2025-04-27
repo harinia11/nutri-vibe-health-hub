@@ -1,11 +1,16 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import MotivationalQuote from '../components/MotivationalQuote';
 
 const Home = () => {
   const { currentUser } = useAuth();
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const username = currentUser.email.split('@')[0];
 
   const features = [
     {
@@ -37,7 +42,7 @@ const Home = () => {
   return (
     <div>
       <section className="hero">
-        <h1>Welcome to NutriVibe</h1>
+        <h1>Welcome back, {username}! 👋</h1>
         <p>Your personal guide to healthy eating and nutrition. Discover meal plans, nutrition tips, and more.</p>
         <Link to="/nutrition-tips" className="btn btn-lg">Get Started</Link>
       </section>

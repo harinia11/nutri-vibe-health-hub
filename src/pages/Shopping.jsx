@@ -1,25 +1,10 @@
-
 import React, { useState } from 'react';
 import FoodCard from '../components/FoodCard';
 import { Input } from "@/components/ui/input";
-import { Search, QrCode } from "lucide-react";
-import { Button } from '@/components/ui/button';
-import { useToast } from "@/hooks/use-toast";
+import { Search } from "lucide-react";
 
 const Shopping = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { toast } = useToast();
-  const [showScanner, setShowScanner] = useState(false);
-  
-  const handleBarcodeClick = () => {
-    setShowScanner(!showScanner);
-    if (!showScanner) {
-      toast({
-        title: "Barcode Scanner",
-        description: "Scan product barcodes to get nutrition information. This feature will be available soon!",
-      });
-    }
-  };
   
   const categories = {
     "Fruits": {
@@ -56,7 +41,7 @@ const Shopping = () => {
         { name: "Cucumber", image: "https://media.istockphoto.com/id/91516166/photo/cucumber-slices-on-a-white-background.jpg?s=612x612&w=0&k=20&c=n4R8_HB2qEmTgOU3xlINv1Am2Z_Mt4CuJiITPta58vw=", benefits: "Hydrating and anti-inflammatory.", price: "25/kg" }
       ]
     },
-   "Grains & Cereals": {
+    "Grains & Cereals": {
       image: "https://images.contentstack.io/v3/assets/blt8a393bb3b76c0ede/blt6f4f408e6ff24f9c/65bc67cba0c878967e593a2a/Whole-grains-and-heart-health.jpg?",
       foods: [
         { name: "Whole Grains", price: "80/kg", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQURSsMI36A8JNbyUJbCS6Zf2RNZSOl8yQdEM0dPUcbT_qj31-Mjoy4SS-EcWNW_MzO46Q&usqp=CAU", benefits: "Improves digestion and heart health." },
@@ -89,7 +74,6 @@ const Shopping = () => {
     }
   };
 
-  // Filter all foods across all categories
   const getAllFoods = () => {
     let allFoods = [];
     Object.values(categories).forEach(category => {
@@ -127,34 +111,8 @@ const Shopping = () => {
               className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
-          <Button 
-            variant="outline" 
-            onClick={handleBarcodeClick}
-            className="flex items-center gap-2"
-          >
-            <QrCode size={16} />
-            <span className="hidden sm:inline">Scan Barcode</span>
-          </Button>
         </div>
       </div>
-      
-      {showScanner && (
-        <div className="mb-8 p-6 border-2 border-dashed border-muted rounded-lg text-center">
-          <QrCode size={64} className="mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-xl font-medium mb-2">Scan Food Product</h3>
-          <p className="text-muted-foreground mb-4">Point your camera at a food product barcode to get nutrition information</p>
-          <Button 
-            onClick={() => 
-              toast({
-                title: "Barcode Scan",
-                description: "This feature is coming soon! It will allow you to scan barcodes and get detailed nutrition information.",
-              })
-            }
-          >
-            Open Camera
-          </Button>
-        </div>
-      )}
       
       {searchResults && searchResults.length > 0 ? (
         <div>

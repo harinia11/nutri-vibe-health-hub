@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Chatbot from '../components/Chatbot';
 import { Globe } from 'lucide-react';
@@ -136,12 +135,23 @@ const NutritionTips = () => {
         ))}
       </div>
       
-      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>{languages[currentLanguage].chatbotTitle}</h2>
+      <style>
+        {`
+          .chatbot-input {
+            color: #000000 !important;
+            background-color: #ffffff !important;
+          }
+        `}
+      </style>
+      
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
+        {languages[currentLanguage].chatbotTitle}
+      </h2>
       <p style={{ textAlign: 'center', marginBottom: '30px' }}>
         {languages[currentLanguage].chatbotDescription}
       </p>
       
-      <Chatbot />
+      <Chatbot currentLanguage={currentLanguage} />
     </div>
   );
 };

@@ -1,10 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Camera, Award, QrCode, Globe } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import HabitTracker from '../components/HabitTracker';
 import HealthPoints from '../components/HealthPoints';
 
@@ -116,6 +115,15 @@ const DietTracking = () => {
       badges: 'బ్యాడ్జీలు'
     }
   };
+
+  const [weeklyData] = useState(() => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days.map(day => ({
+      day,
+      healthyMeals: Math.floor(Math.random() * 5),
+      unhealthyMeals: Math.floor(Math.random() * 3)
+    }));
+  });
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -278,6 +286,30 @@ const DietTracking = () => {
                   </Button>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Weekly Meal Analysis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full overflow-x-auto">
+              <BarChart
+                width={600}
+                height={300}
+                data={weeklyData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="healthyMeals" fill="#4ade80" name="Healthy Meals" />
+                <Bar dataKey="unhealthyMeals" fill="#f87171" name="Unhealthy Meals" />
+              </BarChart>
             </div>
           </CardContent>
         </Card>
