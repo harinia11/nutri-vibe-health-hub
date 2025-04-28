@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { FoodScanner } from '../components/FoodScanner';
 import { WeeklyProgress } from '../components/WeeklyProgress';
 import { languages } from '../constants/languages';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const DietTracking = () => {
-  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const { currentUser } = useAuth();
+  const [currentLanguage] = useState('en');
   
   const [weeklyData] = useState(() => {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -15,25 +20,43 @@ const DietTracking = () => {
     }));
   });
 
-  const handleScanComplete = (isHealthy) => {
-    // Keep basic scan handling for future functionality
-    console.log('Food scan completed:', isHealthy);
-  };
+  // Redirect to login if not authenticated
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-center mb-2">Diet Tracking</h1>
-        <p className="text-muted-foreground text-center">Track your meals with AI-powered food recognition</p>
-      </div>
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <Card className="mb-8 border-none shadow-none">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-3xl font-bold">Diet Tracking</CardTitle>
+          <p className="text-muted-foreground">Track your meals with AI-powered food recognition</p>
+        </CardHeader>
+      </Card>
 
-      <div className="grid gap-6">
-        <FoodScanner
-          currentLanguage={currentLanguage}
-          languages={languages}
-          onScanComplete={handleScanComplete}
-        />
-        <WeeklyProgress data={weeklyData} />
+      <div className="grid gap-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Upload Food Image</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <FoodScanner
+              currentLanguage={currentLanguage}
+              languages={languages}
+              hideControls={true}
+              onScanComplete={() => {}}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Weekly Progress</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WeeklyProgress data={weeklyData} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
