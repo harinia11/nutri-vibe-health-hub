@@ -183,27 +183,31 @@ const DietTracking = () => {
   };
 
   return (
-    <div className="container page-container">
-      <div className="diet-tracking-container max-w-4xl mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h2 className="text-3xl font-bold">📸 Diet Tracking</h2>
-            <p className="text-muted-foreground">Upload your food photo to check if it's healthy or not</p>
+            <h1 className="text-3xl font-bold mb-2">Diet Tracking</h1>
+            <p className="text-muted-foreground">Track your meals and earn rewards for healthy eating habits</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 bg-primary/10 px-3 py-1 rounded-full">
-              <Award size={16} className="text-primary" />
+              <Award className="h-4 w-4 text-primary" />
               <span className="font-medium">{points} {languages[currentLanguage].points}</span>
             </div>
             <Button variant="outline" onClick={handleLanguageChange}>
-              <Globe className="mr-2" />
+              <Globe className="mr-2 h-4 w-4" />
               {languages[currentLanguage].label}
             </Button>
           </div>
         </div>
-        
-        <Card className="mb-8">
-          <CardHeader>
+      </div>
+
+      {/* Food Scanner Section */}
+      <div className="grid gap-6">
+        <Card>
+          <CardHeader className="space-y-1">
             <CardTitle className="flex flex-col sm:flex-row sm:justify-between gap-3">
               <span>Food Scanner</span>
               <div className="flex gap-2 flex-wrap">
@@ -211,28 +215,28 @@ const DietTracking = () => {
                   className={`cursor-pointer ${scanMode === 'food' ? 'bg-primary' : 'bg-secondary'}`}
                   onClick={() => handleScanSelect('food')}
                 >
-                  <Camera size={14} className="mr-1" /> {languages[currentLanguage].scanFood}
+                  <Camera className="mr-1 h-4 w-4" /> {languages[currentLanguage].scanFood}
                 </Badge>
                 <Badge 
                   className={`cursor-pointer ${scanMode === 'barcode' ? 'bg-primary' : 'bg-secondary'}`}
                   onClick={() => handleScanSelect('barcode')}
                 >
-                  <QrCode size={14} className="mr-1" /> {languages[currentLanguage].scanBarcode}
+                  <QrCode className="mr-1 h-4 w-4" /> {languages[currentLanguage].scanBarcode}
                 </Badge>
                 <Badge 
                   className={`cursor-pointer ${scanMode === 'ar' ? 'bg-primary' : 'bg-secondary'}`}
                   onClick={() => handleScanSelect('ar')}
                 >
-                  <Award size={14} className="mr-1" /> {languages[currentLanguage].scanAR}
+                  <Award className="mr-1 h-4 w-4" /> {languages[currentLanguage].scanAR}
                 </Badge>
               </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center space-y-4">
               <Button 
                 onClick={() => fileInputRef.current.click()}
-                className="mb-4 w-full max-w-xs"
+                className="w-full max-w-xs"
               >
                 {languages[currentLanguage].uploadLabel}
               </Button>
@@ -252,7 +256,7 @@ const DietTracking = () => {
               )}
 
               {imageURL && !loading && (
-                <div className="w-full flex flex-col items-center">
+                <div className="w-full flex flex-col items-center space-y-4">
                   <img src={imageURL} alt="preview" className="max-w-full max-h-96 object-contain rounded-lg" />
                   {prediction && (
                     <div className={`mt-4 p-4 w-full rounded-lg text-center ${
@@ -266,7 +270,7 @@ const DietTracking = () => {
               
               {scanMode === 'barcode' && (
                 <div className="border-2 border-dashed border-muted p-6 rounded-md w-full text-center mt-4">
-                  <QrCode size={64} className="mx-auto mb-4 text-muted-foreground" />
+                  <QrCode className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
                   <p>Tap "{languages[currentLanguage].uploadLabel}" to scan a food product barcode</p>
                   <p className="text-sm text-muted-foreground mt-2">Get immediate nutrition information and health assessment</p>
                 </div>
@@ -274,7 +278,7 @@ const DietTracking = () => {
               
               {scanMode === 'ar' && (
                 <div className="border-2 border-dashed border-muted p-6 rounded-md w-full text-center mt-4">
-                  <Camera size={64} className="mx-auto mb-4 text-muted-foreground" />
+                  <Camera className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
                   <p className="font-semibold">Augmented Reality Food Scanner</p>
                   <p className="text-sm text-muted-foreground mt-2">Scan your plate to get real-time nutritional information</p>
                   <Button 
@@ -292,7 +296,8 @@ const DietTracking = () => {
           </CardContent>
         </Card>
 
-        <Card className="mb-8">
+        {/* Weekly Analysis Chart */}
+        <Card>
           <CardHeader>
             <CardTitle>Weekly Meal Analysis</CardTitle>
           </CardHeader>
@@ -316,15 +321,18 @@ const DietTracking = () => {
           </CardContent>
         </Card>
 
-        <div className="mt-8 space-y-8">
+        {/* Habits and Points Section */}
+        <div className="grid gap-6 md:grid-cols-2">
           <HabitTracker />
-          <HealthPoints 
-            points={points} 
-            earnedBadges={badges} 
-            nextMilestone={
-              badgeThresholds.find(badge => !badges.some(b => b.name === badge.name))?.count || 50
-            } 
-          />
+          <div className="space-y-6">
+            <HealthPoints 
+              points={points} 
+              earnedBadges={badges} 
+              nextMilestone={
+                badgeThresholds.find(badge => !badges.some(b => b.name === badge.name))?.count || 50
+              } 
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -332,3 +340,4 @@ const DietTracking = () => {
 };
 
 export default DietTracking;
+
